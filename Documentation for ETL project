@@ -1,0 +1,90 @@
+Data Source:
+https://docs.google.com/spreadsheets/d/1JMcznNMC0tCc-OaniraZ0GYGP7alg828j5aK-pgTRRM/edit#gid=335042293
+Learning resource used:
+https://www.youtube.com/watch?v=N7Qp7_QrchE
+
+Task: Upload to ADF and filter people by those who’s department is IT
+
+Upload to Blob
+Open the created storage account
+Then on the left menu select Containers
+Create a new container and upload files within this
+Created 3 containers
+Uploaded the file into source container
+Then go to Data factories and launch the studio
+Need to create a linked service to upload from blob storage
+Now need to meet schema of table required, for this oen table the schema will be the head (top row)
+Datasets in factory resources, stores schema of the table
+Data flow internally modifies the data
+
+
+First start from dataset and new data set then select blob storage and excel sheet. With this then under file path click the mini folder and select the container source where it was uploaded. 
+Next select the sheet name and choose first row as header.
+After this go to “Schema” and import from connection/store (as it stores from live data)
+Now publish
+Now the dataset is created need to create a data flow:
+
+Here I added a new source and linked dataset to the relevant sheet. 
+After this next to select data flow debug which is the processing path to debug different stages of data flow
+Once the debug is done, go to data preview it will show us top 1000 of the rules and the most current data:
+
+
+Now we need to select the plus icon next to the source to select where department is IT:
+
+For this we want row modifier and filter:
+
+If you put your mouse over the filter on box, it tells you “expression builder” select this to move on:
+
+Here I say the column Department should equal IT. After this I can do data preview and refresh to check it
+
+Next once done we need to “Sink” the data:
+
+For this sink we need to create a new dataset which will be on blob storage and format will be csv
+
+The data flow looks like this:
+
+Then we do the following details for it:
+
+For file path we are choosing dev container.
+Next we click the sink in data flow and go to settings:
+
+Make sure you set as single partition (single partition has less efficiency)
+
+Next publish all.
+Now how can we use this dataflow? For this we need to create a pipeline
+
+For the pipeline created we are using data flow and want to execute this. 
+
+Next configure the settings as below:
+
+As you can see for data flow we selected the one created.
+
+Next using parameters we will tell the pipelines where to run (dev prod or source).
+
+Navigate to FinalDS under datasets, go to parameters 
+Next go to connection:
+
+Select “dynamic content” and add the path we created:
+
+Now based on parameter it will decide the path, if we change parameter to prod it will save dataset there.
+
+Go to pipeline and create a parameter there:
+
+Then to execute go back to settings and add in through dynamic expression builder.
+
+We need to do this as the dataset has a parameter which is referenced by data flow then referenced by pipeline.
+
+Now we need to place the final value somewhere
+Publish changes then:
+
+For this we:
+
+So it triggers final value into production.
+Issue:
+Container doesnt exist on sink1
+Solved. Issue could have been I set the trigger to “prod” and not production, also I may not have published before running the pipeline 
+
+
+
+
+
